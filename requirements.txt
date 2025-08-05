@@ -1,0 +1,8 @@
+# Main dependencies
+numpy==1.24.3          # Mathematical operations and array processing
+pandas==2.0.3          # Table data processing and CSV export
+matplotlib==3.7.1      # Graph visualization
+
+# Additional dependencies for development (optional)
+pytest==7.4.0          # Code testing
+python-dotenv==1.0.0   # Working with environment variables

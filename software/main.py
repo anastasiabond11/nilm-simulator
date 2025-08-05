@@ -18,25 +18,39 @@ if __name__ == "__main__":
         filename="power_plot.png",
     )
 
-    # 3. Detection of events
+    # 3. Detection and analysis of events
     events = detect_events(data["power"], threshold=150, min_duration=15)
 
     print("\nDetected appliances:")
-    for start, end, change in events:
+    for i, (start, end, change) in enumerate(events, 1):
         start_time = data["time"].iloc[start]
         end_time = data["time"].iloc[end]
         duration = end_time - start_time
+        avg_power = data["power"].iloc[start:end].mean()
+        energy_kwh = avg_power * duration / 3600
 
-        # Identifying the device
         appliance = identify_appliance(change, duration)
 
-        print(f"- {appliance.upper()}:")
-        print(f"  Time: {start_time:.1f}s to {end_time:.1f}s")
-        print(f"  Duration: {duration:.1f}s")
-        print(f"  Power change: {change:.1f}W")
-        print(f"  Avg power: {data['power'].iloc[start:end].mean():.1f}W")
+        print(f"\nEvent #{i}: {appliance.upper()}")
+        print("-" * 30)
+        print(f"  Start time:    {start_time:7.1f}s ({start_time / 60:.1f} min)")
+        print(f"  End time:      {end_time:7.1f}s ({end_time / 60:.1f} min)")
+        print(f"  Duration:      {duration:7.1f}s ({duration / 60:.1f} min)")
+        print(f"  Power delta:   {change:7.1f}W")
+        print(f"  Avg power:     {avg_power:7.1f}W")
+        print(f"  Energy used:   {energy_kwh:.3f} kWh")
 
-    # 4. Simulation info
+    # 4. Summary statistics
+    kettle_events = [e for e in events
+                     if identify_appliance(e[2], e[1] - e[0]) == 'kettle']
+
+    print("\nSummary statistics:")
+    print("-" * 30)
+    print(f"Total kettle activations: {len(kettle_events)}")
+    print(f"Total energy used by kettle: {sum(e[2] * (e[1] - e[0]) / 3600 for e in kettle_events):.3f} kWh")
+    print(f"Estimated monthly consumption: {len(kettle_events) * 30 * 0.172:.1f} kWh (30 days)")
+
+    # 5. Simulation info
     print("\nSimulation completed successfully!")
     print(f"- Time range: {data['time'].min():.1f}s to {data['time'].max():.1f}s")
     print(f"- Power range: {data['power'].min():.1f}W to {data['power'].max():.1f}W")

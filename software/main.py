@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from data_generator import generate_power_data
+from software.event_detector import detect_events
 from visualization import plot_power_data
 
 if __name__ == "__main__":
@@ -10,13 +11,24 @@ if __name__ == "__main__":
         sample_rate=10
     )
 
-    # 2. visualization via a separate module
+    # 2. Visualization via a separate module
     plot_power_data(
         df=data,
         filename="power_plot.png",
     )
 
+    # 3. Detection of events
+    events = detect_events(data["power"], threshold=150, min_duration=15)
+
+    print("\nDetected power events:")
+    for start, end, change in events:
+        start_time = data["time"].iloc[start]
+        end_time = data["time"].iloc[end]
+        print(f"- Event: {start_time:.1f}s to {end_time:.1f}s | Δ={change:.1f}W")
+
+    # 4.
     print("\nSimulation completed successfully!")
     print(f"- Time range: {data['time'].min():.1f}s to {data['time'].max():.1f}s")
     print(f"- Power range: {data['power'].min():.1f}W to {data['power'].max():.1f}W")
-    print("- Plot saved as 'advanced_power_plot.png'")
+    print(f"- Detected {len(events)} power events")
+    print("- Plot saved as 'power_plot.png'")

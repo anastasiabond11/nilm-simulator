@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from data_generator import generate_power_data
+from software.appliance_db import identify_appliance
 from software.event_detector import detect_events
 from visualization import plot_power_data
 
@@ -20,13 +21,22 @@ if __name__ == "__main__":
     # 3. Detection of events
     events = detect_events(data["power"], threshold=150, min_duration=15)
 
-    print("\nDetected power events:")
+    print("\nDetected appliances:")
     for start, end, change in events:
         start_time = data["time"].iloc[start]
         end_time = data["time"].iloc[end]
-        print(f"- Event: {start_time:.1f}s to {end_time:.1f}s | Δ={change:.1f}W")
+        duration = end_time - start_time
 
-    # 4.
+        # Identifying the device
+        appliance = identify_appliance(change, duration)
+
+        print(f"- {appliance.upper()}:")
+        print(f"  Time: {start_time:.1f}s to {end_time:.1f}s")
+        print(f"  Duration: {duration:.1f}s")
+        print(f"  Power change: {change:.1f}W")
+        print(f"  Avg power: {data['power'].iloc[start:end].mean():.1f}W")
+
+    # 4. Simulation info
     print("\nSimulation completed successfully!")
     print(f"- Time range: {data['time'].min():.1f}s to {data['time'].max():.1f}s")
     print(f"- Power range: {data['power'].min():.1f}W to {data['power'].max():.1f}W")

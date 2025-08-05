@@ -11,6 +11,8 @@ if __name__ == "__main__":
         duration=7200,
         sample_rate=10
     )
+    data.to_csv("power_data.csv", index=False)
+    print("Data saved in power_data.csv")
 
     # 2. Visualization via a separate module
     plot_power_data(
